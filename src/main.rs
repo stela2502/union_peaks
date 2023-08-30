@@ -55,6 +55,7 @@ fn main() {
     let mut with_data: Vec<bool>= vec![ true; files_n ];
 
     let mut features: Vec<Feature> = vec![Feature::init(); files_n ];
+    let mut write = Vec::<bool>::with_capacity( files_n );
 
     while still_data {
         for i in 0..files_n{
@@ -62,16 +63,33 @@ fn main() {
             if features[i].empty && with_data[i] {
 
                 if let Ok(text) = &ifiles[i].get_line(){
-                    println!("{}", text);
+                    print!("{}", text);
                     features[i] = Feature::parse( text  );
+
                 }else{
                     with_data[i] = false;
                 }
             }
-            // check something - for later
+            write[i] = false;
+        }
+        // check something - for later
+        for i in 0..files_n{
+            if features[i].ty != "Peaks"{
+                write[i] = true;
+            }
+            else {
+                // the feature does not overlap with any other feature and is 'before' all other features
 
+                // but what if it is overlapping? Don't I need a look ahead? There might actually be a whole bunch of 'small' peaks
+                // cluttered together in a 'large' peak of another sample. To make that work in the episcanpy the small peaks all need to get the
+                // positions of the long peak. Then they can be summed up later on.
+
+            }
+        }
+
+        for i in 0..files_n{
             // write everything that should be written
-            if ! features[i].empty{
+            if write[i] {
                 match writeln!( ofiles[i].buff1, "{}", features[i] ){
                     Ok(_) => features[i].empty = true,
                     Err(err) => panic!( "I could not write the data to outfile {i}:\n{err}" ),
