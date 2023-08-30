@@ -24,7 +24,7 @@ impl Ifile{
         // println!( "why does this file break? {}", file1_path.display() );
         let f1 = match File::open(fp1){
             Ok(file) => file,
-            Err(err) => panic!("The file does not exists: {}", err )
+            Err(err) => panic!("An error occured opening the file: {}", err )
         };
 
         let mut data = Vec::<String>::with_capacity(200*1000);
@@ -40,6 +40,7 @@ impl Ifile{
         while ok{
             match cursor.read_line(&mut buf) {
                 Ok(bytes) if bytes > 0 => {
+                    println!("I got something!");
                     data.push(buf.clone());
                     buf.clear();
                 },
