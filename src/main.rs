@@ -62,6 +62,7 @@ fn main() {
             if features[i].empty && with_data[i] {
 
                 if let Ok(text) = &ifiles[i].get_line(){
+                    println!("{}", text);
                     features[i] = Feature::parse( text  );
                 }else{
                     with_data[i] = false;
@@ -71,7 +72,7 @@ fn main() {
 
             // write everything that should be written
             if ! features[i].empty{
-                match writeln!( ofiles[i].buff1, "{}", features[i].to_string() ){
+                match writeln!( ofiles[i].buff1, "{}", features[i] ){
                     Ok(_) => features[i].empty = true,
                     Err(err) => panic!( "I could not write the data to outfile {i}:\n{err}" ),
                 };
@@ -81,6 +82,23 @@ fn main() {
             
         }
 
+    }
+
+    match now.elapsed() {
+        Ok(elapsed) => {
+            let mut milli = elapsed.as_millis();
+
+            let mil = milli % 1000;
+            milli= (milli - mil) /1000;
+
+            let sec = milli % 60;
+            milli= (milli -sec) /60;
+
+            let min = milli % 60;
+            milli= (milli -min) /60;
+
+            println!("union_peaks finished in {milli}h {min}min {sec} sec {mil}milli sec\n" );},
+       Err(e) => {println!("Error: {e:?}");}
     }
 
     

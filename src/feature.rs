@@ -1,4 +1,6 @@
 
+use std::fmt;
+
 
 
 /// feature can parse one line of a 10x features table and compare that to other features tables.
@@ -6,12 +8,12 @@
 
 #[derive(Clone)]
 pub struct Feature {
-    name: String,
-    name2: String,
+    pub name: String,
+    pub name2: String,
     pub ty: String,
-    chr: String,
-    start: usize,
-    end: usize,
+    pub chr: String,
+    pub start: usize,
+    pub end: usize,
     pub empty:bool,
 }
 
@@ -30,7 +32,7 @@ impl Feature{
 	}
 
 	pub fn parse(dat:&str) ->Self{
-		let data:Vec<&str> = dat.split("\t").collect();
+		let data:Vec<&str> = dat.split('\t').collect();
 		Self{
 			name : data[0].to_string(),
 			name2: data[1].to_string(),
@@ -44,10 +46,34 @@ impl Feature{
 	pub fn overlaps(&self, other: &Feature ) -> bool{
 		self.start < other.end && self.end > other.start
 	}
-	pub fn to_string(&self) -> String{
-		format!(
-            "{}\t{}\t{}\t{}\t{}\t{}",
+}
+
+impl fmt::Display for Feature {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}\t{}\t{}\t{}\t{}\t{}",
             self.name, self.name2, self.ty, self.chr, self.start, self.end
         )
-	}
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+
+ 	use crate::Feature;
+
+    #[test]
+    fn check_parse() {
+        let line = "ENSG00000157933\tSKI\tGene Expression\tchr1\t2228318\t2228319";
+        let data = Feature::parse(line);
+        assert_eq!(data.name, "ENSG00000157933".to_string());
+        assert_eq!(data.name2, "SKI".to_string());
+        assert_eq!(data.ty, "Gene Expression".to_string());
+        assert_eq!(data.chr, "chr1".to_string());
+        assert_eq!(data.start, 2228318);
+        assert_eq!(data.end, 2228319);
+      	assert_eq!(format!("{}",data), "ENSG00000157933\tSKI\tGene Expression\tchr1\t2228318\t2228319");
+    }
+
+
 }

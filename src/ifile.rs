@@ -2,11 +2,10 @@
 use std::io::BufReader;
 use std::io::BufRead;
 
-use flate2::write::GzDecoder;
+use flate2::read::GzDecoder;
 
 use std::fs::File;
 use std::path::PathBuf;
-use std::time::SystemTime;
 
 pub struct Ifile {
     pub data: Vec<String>, // BufReader<GzDecoder<File>>,
@@ -16,7 +15,7 @@ pub struct Ifile {
 impl Ifile{
     pub fn new( file:&str )->Self {
 
-        println!("I process the file {}", file.to_string() );
+        println!("I process the file {}", file );
         let fp1 = PathBuf::from(file);
         //let file1_path = PathBuf::from(outpath).join(format!("{}.{}.{}", mode, id, fp1.file_name().unwrap().to_str().unwrap() ));
         
@@ -31,28 +30,20 @@ impl Ifile{
 
         let file1 = GzDecoder::new(f1);
 
-        let mut cursor = BufReader::new( file1 );
+        //println!("{:?}", file1.header() ); // None
 
-        let mut buf = String::new();
-        let mut ok = true;
-        let bytes = 0;
+        let cursor = BufReader::new( file1 );
 
-        while ok{
-            match cursor.read_line(&mut buf) {
-                Ok(bytes) if bytes > 0 => {
-                    println!("I got something!");
-                    data.push(buf.clone());
-                    buf.clear();
-                },
-                Ok(_) => ok = false,
+        //let mut buf = String::new();
+        //let mut ok = true;
+
+        for line in cursor.lines(){
+            match line{
+                Ok(line) => {
+                    //println!("This line worked well: '{}'", &line.clone());
+                    data.push(line);
+                    },
                 Err(err) => eprintln!("I could not read a line from the gz file! {err}"),
-                // match line{
-                //     Ok(line) => {
-                //         println!("This line worked well: '{}'", &line.clone());
-                //         data.push(line);
-                //         },
-                //     Err(err) => eprintln!("I could not read a line from the gz file! {err}"),
-                // }
             }
         }
 
@@ -65,7 +56,7 @@ impl Ifile{
     pub fn get_line(&mut self) -> Result< String, &str> {
         //println!("{} lines in the file", self.data.len() );
         if ! self.data.is_empty(){
-            return Ok(self.data.remove(0));
+            Ok(self.data.remove(0))
         }else {
             Err::< String, &str >( "no more data" )
         }
