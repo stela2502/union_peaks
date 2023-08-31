@@ -15,19 +15,18 @@ use std::path::Path;
 use clap::Parser;
 use std::io::Write;
 
-/// If you have multiple samples of 10x atac data you are screqed
-/// I have not found any option to 'aligne' the peaks over multiple samples.
-/// This leads to the data not being comparable between samples.
-/// To counter this problem this package creates unions of overlapping peaks over multiple 10 atac datasets.
-/// All files are meant to be sorted in the same way.
+/// If you have multiple samples of 10x atac data you might end up with uncomparable results. 
+/// I have not found any option to 'aligne' the peaks over multiple samples. 
+/// This leads to the data not being comparable between samples. 
+/// To counter this problem this program creates unions of overlapping peaks over multiple 10x atac datasets.
 
 #[derive(Parser)]
 #[clap(version = "1.0.0", author = "Stefan L. <stefan.lang@med.lu.se>")]
 struct Opts {
-    /// the paths to the featuretsv.gz files (comma separated string)
+    /// the paths to the feature.tsv.gz files (one comma separated string)
     #[clap(default_value= "testData/B.tsv.gz,testData/C.tsv.gz",short, long)]
     paths: String,
-    /// the outpath
+    /// the outpath (Peak positions will be changed)
     #[clap(default_value=  "testData/Output",short, long)]
     outpath: String,
 }
