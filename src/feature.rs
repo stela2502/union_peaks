@@ -1,8 +1,6 @@
 
 use std::fmt;
-
-
-
+use crate::traits::GenomePosition;
 /// feature can parse one line of a 10x features table and compare that to other features tables.
 /// It can then modifiy a features table and convert the entry back into a string
 
@@ -16,6 +14,7 @@ pub struct Feature {
     pub end: usize,
     pub empty:bool,
 }
+
 
 impl Feature{
 
@@ -43,10 +42,44 @@ impl Feature{
 			empty: false
 		}
 	}
-	pub fn overlaps(&self, other: &Feature ) -> bool{
-		self.start < other.end && self.end > other.start
+	
+	fn overlaps(&self, other: &Self ) -> bool{
+		self.chr == other.chr && self.start < other.end && self.end > other.start
+	}
+	/// Use overlaps and if that is true adjusts the own position to cover the total area.
+	fn overlapps_any_adjust( &mut self, others: Vec<&Self> ) -> bool{
+		let mut ret = false;
+		for other in others{
+			if self.overlaps (other){
+				ret = true;
+				if self.start < other.start{
+					self.start = other.start;
+				}
+				if self.end < other.end{
+					self.end = other.end
+				}
+			}
+		}
+		ret
+	}
+	/// Checks if the self poition has is before the other object
+	fn before(&self, other: &Self ) -> bool{
+		if self.chr == other.chr{
+			self.end < other.start 
+		} else {
+			self.chr.cmp(&other.chr) == std::cmp::Ordering::Less
+		}
+	}
+	fn before_all(&self, others: Vec<&Self> ) -> bool{
+		for other in others{
+			if ! self.before (other){
+				return false
+			}
+		}
+		true
 	}
 }
+
 
 impl fmt::Display for Feature {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

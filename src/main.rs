@@ -3,10 +3,12 @@ use std::fs;
 mod ifile;
 mod ofile;
 mod feature;
+mod matchgroup;
+mod traits;
 use crate::ifile::Ifile;
 use crate::ofile::Ofile;
 use crate::feature::Feature;
-
+use crate::matchgroup::MatchGroup;
 use std::time::SystemTime;
 
 use std::path::Path;
@@ -54,52 +56,61 @@ fn main() {
     let mut still_data = true;
     let mut with_data: Vec<bool>= vec![ true; files_n ];
 
-    let mut features: Vec<Feature> = vec![Feature::init(); files_n ];
-    let mut write = Vec::<bool>::with_capacity( files_n );
+    let mut match_groups= Vec::<MatchGroup>::with_capacity(100);
+    let mut handled:bool;
 
     while still_data {
         for i in 0..files_n{
             // parse the string into a feature
-            if features[i].empty && with_data[i] {
-
-                if let Ok(text) = &ifiles[i].get_line(){
-                    print!("{}", text);
-                    features[i] = Feature::parse( text  );
-
-                }else{
+            match &ifiles[i].get_line(){
+                Ok(text) => {
+                    let feat = Feature::parse( text  );
+                    if feat.ty != "Peaks"{
+                        // if we already have match_groups we need to write them all to file!
+                        for match_group in &match_groups{
+                            for id in &match_group.targets{
+                                match writeln!( ofiles[*id].buff1, "{}", match_group ){
+                                    Ok(_) => (),
+                                    Err(err) => panic!( "I could not write the data to outfile {id}:\n{err}" ),
+                                }
+                            }
+                        }
+                       
+                        match writeln!( ofiles[i].buff1, "{}", feat ){
+                            Ok(_) => (),
+                            Err(err) => panic!( "I could not write the data to outfile {i}:\n{err}" ),
+                        };
+                    }else {
+                        handled = false;
+                        for id in 0..match_groups.len(){
+                        //for  match_group in &match_groups{
+                            if match_groups[id].overlapps_adjust ( &feat ){
+                                match_groups[id].register_write_to( i );
+                                handled = true;
+                            }
+                        }
+                        if ! handled{
+                            match_groups.push( MatchGroup::new( &feat , i) );
+                        }
+                    }
+                    
+                },
+                Err(err) => {
+                    eprintln!("I got an error from the gzipped file {i}: {err} - assume finished");
                     with_data[i] = false;
-                }
-            }
-            write[i] = false;
-        }
-        // check something - for later
-        for i in 0..files_n{
-            if features[i].ty != "Peaks"{
-                write[i] = true;
-            }
-            else {
-                // the feature does not overlap with any other feature and is 'before' all other features
-
-                // but what if it is overlapping? Don't I need a look ahead? There might actually be a whole bunch of 'small' peaks
-                // cluttered together in a 'large' peak of another sample. To make that work in the episcanpy the small peaks all need to get the
-                // positions of the long peak. Then they can be summed up later on.
-
+                },
             }
         }
+        still_data = with_data.iter().any(|&x| x);
+    }
 
-        for i in 0..files_n{
-            // write everything that should be written
-            if write[i] {
-                match writeln!( ofiles[i].buff1, "{}", features[i] ){
-                    Ok(_) => features[i].empty = true,
-                    Err(err) => panic!( "I could not write the data to outfile {i}:\n{err}" ),
-                };
-            }
-
-            still_data = with_data.iter().any(|&x| x);
-            
+    for match_group in &match_groups{
+        for id in &match_group.targets{
+            match writeln!( ofiles[*id].buff1, "{}", match_group ){
+                Ok(_) => (),
+                Err(err) => panic!( "I could not write the data to outfile {id}:\n{err}" ),
+            };
         }
-
     }
 
     match now.elapsed() {
