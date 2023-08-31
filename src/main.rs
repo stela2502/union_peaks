@@ -4,7 +4,6 @@ mod ifile;
 mod ofile;
 mod feature;
 mod matchgroup;
-mod traits;
 use crate::ifile::Ifile;
 use crate::ofile::Ofile;
 use crate::feature::Feature;

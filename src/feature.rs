@@ -1,6 +1,5 @@
 
 use std::fmt;
-use crate::traits::GenomePosition;
 /// feature can parse one line of a 10x features table and compare that to other features tables.
 /// It can then modifiy a features table and convert the entry back into a string
 
