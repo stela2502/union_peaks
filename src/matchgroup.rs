@@ -43,8 +43,9 @@ impl MatchGroup{
 	/// Use overlaps and if that is true adjusts the own position to cover the total area.
 	pub fn overlapps_adjust( &mut self, other: &Feature ) -> bool{
 		if self.overlaps (other){
+			println!("I {} am a match to\n  {}\n------------", self, other );
 			
-			if self.start < other.start{
+			if self.start > other.start{
 				self.start = other.start;
 			}
 			if self.end < other.end{
@@ -52,6 +53,7 @@ impl MatchGroup{
 			}
 			self.name = format!("{}:{}-{}", self.chr, self.start, self.end);
 			self.name2 = self.name.clone();
+			println!("  {}\n--------------", self.name);
 			return true
 		}
 		
