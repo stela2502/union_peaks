@@ -64,14 +64,14 @@ impl Feature{
 		
 		false
 	}
-	// /// Checks if the self poition has is before the other object
-	// fn before(&self, other: &Self ) -> bool{
-	// 	if self.chr == other.chr{
-	// 		self.end < other.start 
-	// 	} else {
-	// 		self.chr.cmp(&other.chr) == std::cmp::Ordering::Less
-	// 	}
-	// }
+	/// Checks if the self poition is located before the other object
+	pub fn before(&self, other: &Self ) -> bool{
+		if self.chr == other.chr{
+			self.end < other.start 
+		} else {
+			self.chr.cmp(&other.chr) == std::cmp::Ordering::Less
+		}
+	}
 	// pub fn before_all(&self, others: Vec<&Self> ) -> bool{
 	// 	for other in others{
 	// 		if ! self.before (other){

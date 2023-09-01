@@ -73,6 +73,7 @@ fn main() {
     pb.set_style(spinner_style);
 
     let mut id =0;
+    let mut max:usize;
 
     while still_data {
         id += 1;
@@ -107,7 +108,14 @@ fn main() {
                             };
                         }else {
                             handled = false;
+                            max = 0;
                             for id in (0..match_groups.len()).rev() {
+                                if match_groups[id].before( &feat ){
+                                    max +=1;
+                                }
+                                if max == 100{
+                                    break;
+                                }
                             //for  match_group in &match_groups{
                                 if match_groups[id].overlapps_adjust ( &feat ){
                                     //println!("MatchGroup \n{} matched feature \n{}", match_groups[id], feat );
@@ -135,7 +143,13 @@ fn main() {
         still_data = with_data.iter().any(|&x| x);
     }
 
+    println!("Creating outfiles");
+
     for i in 0..files_n{
+        id += 1;
+        if id % 1000 ==0{
+            pb.inc(1);
+        }
         for id in &ofiles_pos[i]{
             //println!("printing to file {i}: {}", match_groups[*id]);
             match writeln!( ofiles[i].buff1, "{}", match_groups[*id] ){
