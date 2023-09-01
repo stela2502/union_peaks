@@ -74,8 +74,13 @@ fn main() {
     let pb = m.add(ProgressBar::new(1000));
     pb.set_style(spinner_style);
 
+    let id =0;
+
     while still_data {
-        pb.inc(1);
+        id += 1;
+        if id % 1000 ==0{
+            pb.inc(1);
+        }
         for i in 0..files_n{
 
             if with_data[i]{
