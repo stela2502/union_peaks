@@ -56,14 +56,22 @@ fn main() {
     let mut still_data = true;
     let mut with_data: Vec<bool>= vec![ true; files_n ];
 
-    let mut match_groups= Vec::<MatchGroup>::with_capacity(100);
+    let mut match_groups= Vec::<Feature>::with_capacity(100000);
     let mut handled:bool;
+
+    // the features need to be registered with the outfiles
+    let mut ofiles_pos: Vec<Vec<usize>> = Vec::new();
+    for id in 0..files_n{
+        let mut file = Vec::<usize>::with_capacity(100000);
+        ofiles_pos.push( file );
+    }
+
 
     let spinner_style = ProgressStyle::with_template("{prefix:.bold.dim} {spinner} {wide_msg}")
             .unwrap()
             .tick_chars("⠁⠂⠄⡀⢀⠠⠐⠈ ");
     let m = MultiProgress::new();
-    let pb = m.add(ProgressBar::new(5000));
+    let pb = m.add(ProgressBar::new(1000));
     pb.set_style(spinner_style);
 
     while still_data {
@@ -78,13 +86,15 @@ fn main() {
                         let feat = Feature::parse( text  );
                         if feat.ty != "Peaks"{
                             // if we already have match_groups we need to write them all to file!
-                            for match_group in &match_groups{
-                                for id in &match_group.targets{
-                                    match writeln!( ofiles[*id].buff1, "{}", match_group ){
+                            for i in 0..files_n{
+                                for id in &ofiles_pos[i]{
+                                    //println!("printing to file {id}: {}", match_groups[id]);
+                                    match writeln!( ofiles[i].buff1, "{}", match_groups[*id] ){
                                         Ok(_) => (),
-                                        Err(err) => panic!( "I could not write the data to outfile {id}:\n{err}" ),
-                                    }
+                                        Err(err) => panic!( "I could not write the data to outfile {i}:\n{err}" ),
+                                    };
                                 }
+                                ofiles_pos[i].clear();
                             }
                             match_groups.clear();
 
@@ -98,13 +108,16 @@ fn main() {
                             //for  match_group in &match_groups{
                                 if match_groups[id].overlapps_adjust ( &feat ){
                                     //println!("MatchGroup \n{} matched feature \n{}", match_groups[id], feat );
-                                    match_groups[id].register_write_to( i );
+                                    ofiles_pos[i].push(id);
+                                    //match_groups[id].register_write_to( i );
                                     handled = true;
                                     break;
                                 }
                             }
                             if ! handled{
-                                match_groups.push( MatchGroup::new( &feat , i) );
+                                //match_groups.push( MatchGroup::new( &feat , i) );
+                                match_groups.push(feat);
+                                ofiles_pos[i].push( match_groups.len()-1);
                             }
                         }
                         
@@ -119,16 +132,28 @@ fn main() {
         still_data = with_data.iter().any(|&x| x);
     }
 
-    for match_group in &match_groups{
-        for id in &match_group.targets{
-            println!("printing to file {id}: {}", match_group);
-            match writeln!( ofiles[*id].buff1, "{}", match_group ){
+    for i in 0..files_n{
+        for id in &ofiles_pos[i]{
+            println!("printing to file {i}: {}", match_groups[*id]);
+            match writeln!( ofiles[i].buff1, "{}", match_groups[*id] ){
                 Ok(_) => (),
-                Err(err) => panic!( "I could not write the data to outfile {id}:\n{err}" ),
+                Err(err) => panic!( "I could not write the data to outfile {i}:\n{err}" ),
             };
         }
+        ofiles_pos[i].clear();
     }
     match_groups.clear();
+
+    // for match_group in &match_groups{
+    //     for id in &match_group.targets{
+    //         println!("printing to file {id}: {}", match_group);
+    //         match writeln!( ofiles[*id].buff1, "{}", match_group ){
+    //             Ok(_) => (),
+    //             Err(err) => panic!( "I could not write the data to outfile {id}:\n{err}" ),
+    //         };
+    //     }
+    // }
+    //match_groups.clear();
 
     pb.finish_with_message( "Finished" );
 
@@ -187,8 +212,16 @@ mod tests {
         let files_n = 2;
         let mut still_data = true;
         let mut with_data: Vec<bool>= vec![ true; files_n ];
-        let mut match_groups= Vec::<MatchGroup>::with_capacity(100);
+        let mut match_groups= Vec::<Feature>::with_capacity(100);
         let mut handled:bool;
+
+
+        // the features need to be registered with the outfiles
+        let mut ofiles_pos: Vec<Vec<usize>> = Vec::new();
+        for id in 0..files_n{
+            let mut file = Vec::<usize>::with_capacity(100000);
+            ofiles_pos.push( file );
+        }
 
         while still_data {
             for i in 0..files_n{
@@ -204,14 +237,16 @@ mod tests {
                             for id in (0..match_groups.len()).rev() {
                             //for  match_group in &match_groups{
                                 if match_groups[id].overlapps_adjust ( &feat ){
-
-                                    match_groups[id].register_write_to( i );
+                                    ofiles_pos[i].push(id);
+                                    //match_groups[id].register_write_to( i );
                                     handled = true;
                                     break;
                                 }
                             }
                             if ! handled{
-                                match_groups.push( MatchGroup::new( &feat , i) );
+                                //match_groups.push( MatchGroup::new( &feat , i) );
+                                match_groups.push(feat);
+                                ofiles_pos[i].push( match_groups.len()-1);
                             }
                             
                             
@@ -232,12 +267,21 @@ mod tests {
         ofiles.push( file1 );
         ofiles.push( file2 );
 
-        for match_group in &match_groups{
-            for id in &match_group.targets{
-                ofiles[*id].push( format!("{}", match_group));
+
+        for i in 0..files_n{
+            for id in &ofiles_pos[i]{
+                ofiles[i].push( format!("{}", match_groups[*id]));
             }
+            ofiles_pos[i].clear();
         }
         match_groups.clear();
+
+        // for match_group in &match_groups{
+        //     for id in &match_group.targets{
+        //         ofiles[*id].push( format!("{}", match_group));
+        //     }
+        // }
+        // match_groups.clear();
 
         // now lets  check what we got:
 
@@ -271,7 +315,6 @@ mod tests {
 
         #[test]
     fn check_parse_switch_files() { // chr1:30-35 is registered after chr1:52-70 and therefore changes positions in the outfile
-
         let test_data1 = vec![
             "chr1:10-20\tchr1:10-20\tPeaks\tchr1\t10\t20".to_string(),
             "chr1:30-35\tchr1:30-35\tPeaks\tchr1\t30\t35".to_string(),
@@ -295,8 +338,16 @@ mod tests {
         let files_n = 2;
         let mut still_data = true;
         let mut with_data: Vec<bool>= vec![ true; files_n ];
-        let mut match_groups= Vec::<MatchGroup>::with_capacity(100);
+        let mut match_groups= Vec::<Feature>::with_capacity(100);
         let mut handled:bool;
+
+
+        // the features need to be registered with the outfiles
+        let mut ofiles_pos: Vec<Vec<usize>> = Vec::new();
+        for id in 0..files_n{
+            let mut file = Vec::<usize>::with_capacity(100000);
+            ofiles_pos.push( file );
+        }
 
         while still_data {
             for i in 0..files_n{
@@ -312,14 +363,16 @@ mod tests {
                             for id in (0..match_groups.len()).rev() {
                             //for  match_group in &match_groups{
                                 if match_groups[id].overlapps_adjust ( &feat ){
-
-                                    match_groups[id].register_write_to( i );
+                                    ofiles_pos[i].push(id);
+                                    //match_groups[id].register_write_to( i );
                                     handled = true;
                                     break;
                                 }
                             }
                             if ! handled{
-                                match_groups.push( MatchGroup::new( &feat , i) );
+                                //match_groups.push( MatchGroup::new( &feat , i) );
+                                match_groups.push(feat);
+                                ofiles_pos[i].push( match_groups.len()-1);
                             }
                             
                             
@@ -340,12 +393,21 @@ mod tests {
         ofiles.push( file1 );
         ofiles.push( file2 );
 
-        for match_group in &match_groups{
-            for id in &match_group.targets{
-                ofiles[*id].push( format!("{}", match_group));
+
+        for i in 0..files_n{
+            for id in &ofiles_pos[i]{
+                ofiles[i].push( format!("{}", match_groups[*id]));
             }
+            ofiles_pos[i].clear();
         }
         match_groups.clear();
+
+        // for match_group in &match_groups{
+        //     for id in &match_group.targets{
+        //         ofiles[*id].push( format!("{}", match_group));
+        //     }
+        // }
+        // match_groups.clear();
 
         // now lets  check what we got:
 
