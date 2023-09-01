@@ -59,44 +59,49 @@ fn main() {
 
     while still_data {
         for i in 0..files_n{
-            // parse the string into a feature
-            match &ifiles[i].get_line(){
-                Ok(text) => {
-                    let feat = Feature::parse( text  );
-                    if feat.ty != "Peaks"{
-                        // if we already have match_groups we need to write them all to file!
-                        for match_group in &match_groups{
-                            for id in &match_group.targets{
-                                match writeln!( ofiles[*id].buff1, "{}", match_group ){
-                                    Ok(_) => (),
-                                    Err(err) => panic!( "I could not write the data to outfile {id}:\n{err}" ),
+
+            if with_data[i]{
+                // parse the string into a feature
+                match &ifiles[i].get_line(){
+                    Ok(text) => {
+                        let feat = Feature::parse( text  );
+                        if feat.ty != "Peaks"{
+                            // if we already have match_groups we need to write them all to file!
+                            for match_group in &match_groups{
+                                for id in &match_group.targets{
+                                    match writeln!( ofiles[*id].buff1, "{}", match_group ){
+                                        Ok(_) => (),
+                                        Err(err) => panic!( "I could not write the data to outfile {id}:\n{err}" ),
+                                    }
                                 }
                             }
-                        }
-                       
-                        match writeln!( ofiles[i].buff1, "{}", feat ){
-                            Ok(_) => (),
-                            Err(err) => panic!( "I could not write the data to outfile {i}:\n{err}" ),
-                        };
-                    }else {
-                        handled = false;
-                        for id in 0..match_groups.len(){
-                        //for  match_group in &match_groups{
-                            if match_groups[id].overlapps_adjust ( &feat ){
-                                match_groups[id].register_write_to( i );
-                                handled = true;
+                            match_groups.clear();
+
+                            match writeln!( ofiles[i].buff1, "{}", feat ){
+                                Ok(_) => (),
+                                Err(err) => panic!( "I could not write the data to outfile {i}:\n{err}" ),
+                            };
+                        }else {
+                            handled = false;
+                            for id in match_groups.len()..0{
+                            //for  match_group in &match_groups{
+                                if match_groups[id].overlapps_adjust ( &feat ){
+                                    match_groups[id].register_write_to( i );
+                                    handled = true;
+                                    break;
+                                }
+                            }
+                            if ! handled{
+                                match_groups.push( MatchGroup::new( &feat , i) );
                             }
                         }
-                        if ! handled{
-                            match_groups.push( MatchGroup::new( &feat , i) );
-                        }
-                    }
-                    
-                },
-                Err(err) => {
-                    eprintln!("I got an error from the gzipped file {i}: {err} - assume finished");
-                    with_data[i] = false;
-                },
+                        
+                    },
+                    Err(err) => {
+                        eprintln!("I got an error from the gzipped file {i}: {err} - assume finished");
+                        with_data[i] = false;
+                    },
+                }
             }
         }
         still_data = with_data.iter().any(|&x| x);
@@ -110,6 +115,7 @@ fn main() {
             };
         }
     }
+    match_groups.clear();
 
     match now.elapsed() {
         Ok(elapsed) => {
