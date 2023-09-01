@@ -42,24 +42,27 @@ impl Feature{
 		}
 	}
 	
-	fn overlaps(&self, other: &Self ) -> bool{
+	fn overlaps(&self, other: &Feature ) -> bool{
 		self.chr == other.chr && self.start < other.end && self.end > other.start
 	}
 	/// Use overlaps and if that is true adjusts the own position to cover the total area.
-	fn overlapps_any_adjust( &mut self, others: Vec<&Self> ) -> bool{
-		let mut ret = false;
-		for other in others{
-			if self.overlaps (other){
-				ret = true;
-				if self.start < other.start{
-					self.start = other.start;
-				}
-				if self.end < other.end{
-					self.end = other.end
-				}
+	pub fn overlapps_adjust( &mut self, other: &Feature ) -> bool{
+		if self.overlaps (other){
+			println!("I {} am a match to\n  {}\n------------", self, other );
+			
+			if self.start > other.start{
+				self.start = other.start;
 			}
+			if self.end < other.end{
+				self.end = other.end
+			}
+			self.name = format!("{}:{}-{}", self.chr, self.start, self.end);
+			self.name2 = self.name.clone();
+			println!("  {} <- should have changed?!\n--------------", self.name);
+			return true
 		}
-		ret
+		
+		false
 	}
 	/// Checks if the self poition has is before the other object
 	fn before(&self, other: &Self ) -> bool{
@@ -69,7 +72,7 @@ impl Feature{
 			self.chr.cmp(&other.chr) == std::cmp::Ordering::Less
 		}
 	}
-	fn before_all(&self, others: Vec<&Self> ) -> bool{
+	pub fn before_all(&self, others: Vec<&Self> ) -> bool{
 		for other in others{
 			if ! self.before (other){
 				return false
