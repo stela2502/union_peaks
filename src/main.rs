@@ -74,7 +74,7 @@ fn main() {
     let pb = m.add(ProgressBar::new(1000));
     pb.set_style(spinner_style);
 
-    let id =0;
+    let mut id =0;
 
     while still_data {
         id += 1;
@@ -139,7 +139,7 @@ fn main() {
 
     for i in 0..files_n{
         for id in &ofiles_pos[i]{
-            println!("printing to file {i}: {}", match_groups[*id]);
+            //println!("printing to file {i}: {}", match_groups[*id]);
             match writeln!( ofiles[i].buff1, "{}", match_groups[*id] ){
                 Ok(_) => (),
                 Err(err) => panic!( "I could not write the data to outfile {i}:\n{err}" ),
