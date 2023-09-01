@@ -3,11 +3,9 @@ use std::fs;
 mod ifile;
 mod ofile;
 mod feature;
-mod matchgroup;
 use crate::ifile::Ifile;
 use crate::ofile::Ofile;
 use crate::feature::Feature;
-use crate::matchgroup::MatchGroup;
 use std::time::SystemTime;
 
 use indicatif::{ProgressBar, ProgressStyle, MultiProgress};
@@ -61,8 +59,8 @@ fn main() {
 
     // the features need to be registered with the outfiles
     let mut ofiles_pos: Vec<Vec<usize>> = Vec::new();
-    for id in 0..files_n{
-        let mut file = Vec::<usize>::with_capacity(100000);
+    for _id in 0..files_n{
+        let file = Vec::<usize>::with_capacity(100000);
         ofiles_pos.push( file );
     }
 
@@ -187,9 +185,7 @@ fn main() {
 mod tests {
 
     use crate::ifile::Ifile;
-    use crate::ofile::Ofile;
     use crate::feature::Feature;
-    use crate::matchgroup::MatchGroup;
 
     #[test]
     fn check_parse() {
@@ -223,8 +219,8 @@ mod tests {
 
         // the features need to be registered with the outfiles
         let mut ofiles_pos: Vec<Vec<usize>> = Vec::new();
-        for id in 0..files_n{
-            let mut file = Vec::<usize>::with_capacity(100000);
+        for _id in 0..files_n{
+            let  file = Vec::<usize>::with_capacity(100000);
             ofiles_pos.push( file );
         }
 
@@ -267,8 +263,8 @@ mod tests {
         }
         
         let mut ofiles: Vec<Vec<String>> = Vec::new();
-        let mut file1 = Vec::<String>::with_capacity(20);
-        let mut file2 = Vec::<String>::with_capacity(20);
+        let  file1 = Vec::<String>::with_capacity(20);
+        let  file2 = Vec::<String>::with_capacity(20);
         ofiles.push( file1 );
         ofiles.push( file2 );
 
@@ -349,8 +345,8 @@ mod tests {
 
         // the features need to be registered with the outfiles
         let mut ofiles_pos: Vec<Vec<usize>> = Vec::new();
-        for id in 0..files_n{
-            let mut file = Vec::<usize>::with_capacity(100000);
+        for _id in 0..files_n{
+            let  file = Vec::<usize>::with_capacity(100000);
             ofiles_pos.push( file );
         }
 
@@ -393,8 +389,8 @@ mod tests {
         }
         
         let mut ofiles: Vec<Vec<String>> = Vec::new();
-        let mut file1 = Vec::<String>::with_capacity(20);
-        let mut file2 = Vec::<String>::with_capacity(20);
+        let  file1 = Vec::<String>::with_capacity(20);
+        let  file2 = Vec::<String>::with_capacity(20);
         ofiles.push( file1 );
         ofiles.push( file2 );
 

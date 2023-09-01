@@ -17,17 +17,17 @@ pub struct Feature {
 
 impl Feature{
 
-	pub fn init() ->Self{
-		Self{
-			name : "".to_string(),
-			name2: "".to_string(),
-			ty   : "".to_string(),
-			chr  : "".to_string(),
-			start: 0,
-			end  : 0,
-			empty: true
-		}
-	}
+	// pub fn init() ->Self{
+	// 	Self{
+	// 		name : "".to_string(),
+	// 		name2: "".to_string(),
+	// 		ty   : "".to_string(),
+	// 		chr  : "".to_string(),
+	// 		start: 0,
+	// 		end  : 0,
+	// 		empty: true
+	// 	}
+	// }
 
 	pub fn parse(dat:&str) ->Self{
 		let data:Vec<&str> = dat.split('\t').collect();
@@ -64,22 +64,22 @@ impl Feature{
 		
 		false
 	}
-	/// Checks if the self poition has is before the other object
-	fn before(&self, other: &Self ) -> bool{
-		if self.chr == other.chr{
-			self.end < other.start 
-		} else {
-			self.chr.cmp(&other.chr) == std::cmp::Ordering::Less
-		}
-	}
-	pub fn before_all(&self, others: Vec<&Self> ) -> bool{
-		for other in others{
-			if ! self.before (other){
-				return false
-			}
-		}
-		true
-	}
+	// /// Checks if the self poition has is before the other object
+	// fn before(&self, other: &Self ) -> bool{
+	// 	if self.chr == other.chr{
+	// 		self.end < other.start 
+	// 	} else {
+	// 		self.chr.cmp(&other.chr) == std::cmp::Ordering::Less
+	// 	}
+	// }
+	// pub fn before_all(&self, others: Vec<&Self> ) -> bool{
+	// 	for other in others{
+	// 		if ! self.before (other){
+	// 			return false
+	// 		}
+	// 	}
+	// 	true
+	// }
 }
 
 
