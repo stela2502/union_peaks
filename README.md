@@ -47,3 +47,9 @@ OPTIONS:
 ```
 
 
+## Ideas of how to publish this?
+
+    
+Would it be possible to compare GSE209878 to GSM6176366? This would be kind of interesting.
+Especially as GSM6176366 also provides a csv file that I could convert using my RustySparseMMX program.
+
