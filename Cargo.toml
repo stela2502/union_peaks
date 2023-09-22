@@ -3,6 +3,14 @@ name = "union_peaks"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "union_peaks"
+path = "src/libs.rs"
+
+[[bin]]
+name = "union_peaks"
+path = "union_peaks/bin/union_peaks.rs"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
