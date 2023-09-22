@@ -1,6 +1,6 @@
 
-use union_peaks::ifile::Ifile;
-use union_peaks::ofile::Ofile;
+use union_peaks::ifile_simple::IfileSimple;
+use union_peaks::ofile_simple::OfileSimple;
 use union_peaks::feature::Feature;
 //use union_peaks::matchgroup::MatchGroup;
 use std::time::SystemTime;
@@ -43,12 +43,12 @@ fn main() {
 
     //fs::create_dir_all(&opts.outpath).expect("AlreadyExists");
 
-    let mut ifiles = Vec::<Ifile>::with_capacity( 2 );
-    let mut ofiles = Vec::<Ofile>::with_capacity( 1 );
-    ifiles.push( Ifile::new( &opts.a ));
-	ifiles.push( Ifile::new( &opts.b ));
+    //let mut ifiles = Vec::<Ifile>::with_capacity( 2 );
+    let mut a = IfileSimple::new( &opts.a );
+    let mut b = IfileSimple::new( &opts.b );
+    
+    let mut o = OfileSimple::new_file( &opts.o );
 
-	ofiles.push( Ofile::new_file( &opts.o ));
 
     let spinner_style = ProgressStyle::with_template("{prefix:.bold.dim} {spinner} {wide_msg}")
             .unwrap()
@@ -61,8 +61,10 @@ fn main() {
 
     let mut still_data = true;
 
-    let mut other:Feature = match &ifiles[1].get_line() {
+    //println!("This is the first read_bed call!");
+    let mut other:Feature = match &b.get_line() {
     	Ok(text) => {
+    		//println!("I got a bed entry: {text}");
 			Feature::parse_bed( text  )
 		},
 		Err(err) => {
@@ -71,17 +73,20 @@ fn main() {
 			Feature::blank()
 		}
 	};
-    while match &ifiles[0].get_line() {
+    while match &a.get_line() {
     	Ok(text) => {
+    		//println!("working ion iid {id}");
 	        id += 1;
 	        if id % 1000 ==0{
 	            pb.inc(1);
 	        }
             let mut feat = Feature::parse_bed( text  );
 
+            //println!( "I am processing an bed entry a: {}", &feat.name2 );
+
             // get rid of all other elements that lie before our entry
            	while still_data && other.before( &feat ) {
-            	other = match &ifiles[1].get_line() {
+            	other = match &b.get_line() {
 	            	Ok(text) => {
             			Feature::parse_bed( text  )
             		},
@@ -96,10 +101,11 @@ fn main() {
         	while still_data && other.overlaps( &feat ) {
         		// here we collect the info that should be added to this feature.
         		if &other.var > &opts.cutoff{
+        			//println!( "Match!" ); 
         			feat.push( format!("{}/{}/{}", other.name, other.name2, other.var ) );
         		}
 
-            	other = match &ifiles[1].get_line() {
+            	other = match &b.get_line() {
 	            	Ok(text) => {
             			Feature::parse_bed( text  )
             		},
@@ -112,7 +118,7 @@ fn main() {
         	}
 
         	// now we collected all matching entried for this feature - print it
-        	match writeln!( ofiles[0].buff1, "{}", feat.to_bed() ){
+        	match writeln!( o.buff1, "{}", feat.to_bed() ){
                 Ok(_) => (),
                 Err(err) => panic!( "I could not write the data to outfile:\n{err}" ),
             };
@@ -124,7 +130,7 @@ fn main() {
         }
     }{} // there is nothing else to do here.
 
-    pb.finish_with_message( "Finished" );
+    pb.finish_with_message( format!("Finished processing {id} bed entries (a)") );
 
     match now.elapsed() {
         Ok(elapsed) => {
