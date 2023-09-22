@@ -76,7 +76,7 @@ fn main() {
 		}
 	};
 
-	println( "data read - matching" );
+	println!( "data read - matching" );
     while match &a.get_line() {
     	Ok(text) => {
     		//println!("working ion iid {id}");
