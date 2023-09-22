@@ -9,7 +9,7 @@ path = "src/libs.rs"
 
 [[bin]]
 name = "union_peaks"
-path = "union_peaks/bin/union_peaks.rs"
+path = "src/bin/union_peaks.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
