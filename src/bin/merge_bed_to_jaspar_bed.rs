@@ -14,7 +14,8 @@ use std::io::Write;
 
 
 /// This script is used to annotated 10x atac data using the jaspar database.
-/// The jaspar database is simply a bed file in this case. BibBed files are not supported up to now.
+/// The jaspar database is simply a bed file in this case. 
+/// BigBed files are not supported up to now.
 /// The program expects the bed files to be sorted - otherwise it will fail!
 
 
@@ -44,6 +45,7 @@ fn main() {
     //fs::create_dir_all(&opts.outpath).expect("AlreadyExists");
 
     //let mut ifiles = Vec::<Ifile>::with_capacity( 2 );
+    println!("starting to read the bed files");
     let mut a = IfileSimple::new( &opts.a );
     let mut b = IfileSimple::new( &opts.b );
     
@@ -73,6 +75,8 @@ fn main() {
 			Feature::blank()
 		}
 	};
+
+	println( "data read - matching" );
     while match &a.get_line() {
     	Ok(text) => {
     		//println!("working ion iid {id}");
