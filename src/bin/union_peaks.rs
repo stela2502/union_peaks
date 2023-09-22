@@ -9,13 +9,17 @@ mod matchgroup;
 use union_peaks::ifile::Ifile;
 use union_peaks::ofile::Ofile;
 use union_peaks::feature::Feature;
-use union_peaks::matchgroup::MatchGroup;
+//use union_peaks::matchgroup::MatchGroup;
 use std::time::SystemTime;
 
 use std::path::Path;
+use indicatif::ProgressStyle;
+use indicatif::MultiProgress;
+use indicatif::ProgressBar;
 
 use clap::Parser;
 use std::io::Write;
+
 
 /// If you have multiple samples of 10x atac data you might end up with uncomparable results. 
 /// I have not found any option to 'aligne' the peaks over multiple samples. 
@@ -200,8 +204,8 @@ fn main() {
 #[cfg(test)]
 mod tests {
 
-    use crate::ifile::Ifile;
-    use crate::feature::Feature;
+    use union_peaks::ifile::Ifile;
+    use union_peaks::feature::Feature;
 
     #[test]
     fn check_parse() {

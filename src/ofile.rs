@@ -2,7 +2,7 @@
 use std::io::BufWriter;
 use flate2::Compression;
 use flate2::write::GzEncoder;
-
+use std::fs;
 use std::fs::File;
 use std::path::PathBuf;
 
@@ -15,6 +15,31 @@ pub struct Ofile {
 
 /// Ofiles encapsulates two BufWriter<GzEncoder<File>> objects to make handling of 20 of these more convenient.
 impl Ofile{
+    pub fn new_file( file:&str )->Self {
+
+        let fp1 = PathBuf::from(file);
+        let opath = fp1.parent().unwrap();
+        fs::create_dir_all(opath).expect("AlreadyExists");
+
+        // need better error handling here too
+        // println!( "why does this file break? {}", file1_path.display() );
+        let f1 = match File::create(fp1){
+            Ok(file) => file,
+            Err(err) => panic!("The file cound not be created: {err}"  )
+        };
+        
+        let file1 = GzEncoder::new(f1, Compression::default());
+
+        let buff1 = BufWriter::new( file1 );
+
+        let count:u32 = 0;
+        Self{
+            count,
+            //file1,
+            //file2,
+            buff1
+        }
+    }
     pub fn new( file:&str, outpath:&str )->Self {
 
         let mut fp1 = PathBuf::from(outpath);

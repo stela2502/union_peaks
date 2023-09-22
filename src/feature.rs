@@ -11,23 +11,27 @@ pub struct Feature {
     pub chr: String,
     pub start: usize,
     pub end: usize,
+    pub addons:Vec<String>,
+    pub var:usize,
     pub empty:bool,
 }
 
 
 impl Feature{
 
-	// pub fn init() ->Self{
-	// 	Self{
-	// 		name : "".to_string(),
-	// 		name2: "".to_string(),
-	// 		ty   : "".to_string(),
-	// 		chr  : "".to_string(),
-	// 		start: 0,
-	// 		end  : 0,
-	// 		empty: true
-	// 	}
-	// }
+	pub fn blank() ->Self{
+		Self{
+			name : "".to_string(),
+			name2: "".to_string(),
+			ty   : "".to_string(),
+			chr  : "".to_string(),
+			start: 0,
+			end  : 0,
+			addons : Vec::<String>::with_capacity(10),
+			var: 0,
+			empty: true
+		}
+	}
 
 	pub fn parse(dat:&str) ->Self{
 		let data:Vec<&str> = dat.split('\t').collect();
@@ -38,11 +42,54 @@ impl Feature{
 			chr  : data[3].to_string(),
 			start: data[4].parse::<usize>().unwrap_or_default(),
 			end  : data[5].parse::<usize>().unwrap_or_default(),
+			addons : Vec::<String>::with_capacity(10),
+			var:0,
 			empty: false
 		}
 	}
+	pub fn parse_bed(dat:&str) ->Self{
+		//chr1	3000000	3000012	MA0157.3	304	-	Foxo3
+		let data:Vec<&str> = dat.split('\t').collect();
+		if data.len() > 5{
+			Self{
+				name : data[0].to_string() +":" + &data[1].to_string()+"-"+&data[2].to_string(),
+				name2: data[3].to_string() + "/" + &data[6].to_string(),
+				ty   : "bed".to_string(),
+				chr  : data[0].to_string(),
+				start: data[1].parse::<usize>().unwrap_or_default(),
+				end  : data[2].parse::<usize>().unwrap_or_default(),
+				addons : Vec::<String>::with_capacity(10),
+				var: data[4].parse::<usize>().unwrap_or_default(),
+				empty: false
+			}
+		}else if data.len() > 2{
+			Self{
+				name : data[0].to_string() +":" + &data[1].to_string()+"-"+&data[2].to_string(),
+				name2: data[0].to_string() +":" + &data[1].to_string()+"-"+&data[2].to_string(),
+				ty   : "bed".to_string(),
+				chr  : data[0].to_string(),
+				start: data[1].parse::<usize>().unwrap_or_default(),
+				end  : data[2].parse::<usize>().unwrap_or_default(),
+				addons : Vec::<String>::with_capacity(10),
+				var:0,
+				empty: false
+			}
+		}
+		else {
+			panic!("this bed entry could not be parsed:\n{}", data.join("\t") );
+		}
+	}
+
+	pub fn push(&mut self, dat:String ){
+		self.addons.push(dat);
+	}
+
+	pub fn to_bed( &self ) -> String{
+		format!("{}\t{}\t{}\t{}\t{}\t{}\t{}",self.chr, self.start, self.end, self.name, 0, "-", self.addons.join(";") )
+	}
 	
-	fn overlaps(&self, other: &Feature ) -> bool{
+
+	pub fn overlaps(&self, other: &Feature ) -> bool{
 		self.chr == other.chr && self.start < other.end && self.end > other.start
 	}
 	/// Use overlaps and if that is true adjusts the own position to cover the total area.
