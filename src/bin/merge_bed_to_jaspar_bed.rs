@@ -90,6 +90,10 @@ fn main() {
 
             // get rid of all other elements that lie before our entry
            	while still_data && other.before( &feat ) {
+           		id += 1;
+		        if id % 1000 ==0{
+		            pb.inc(1);
+		        }
             	other = match &b.get_line() {
 	            	Ok(text) => {
             			Feature::parse_bed( text  )
@@ -103,6 +107,10 @@ fn main() {
         	}
         	// collect the matching ones
         	while still_data && other.overlaps( &feat ) {
+        		id += 1;
+		        if id % 1000 ==0{
+		            pb.inc(1);
+		        }
         		// here we collect the info that should be added to this feature.
         		if &other.var > &opts.cutoff{
         			//println!( "Match!" ); 
