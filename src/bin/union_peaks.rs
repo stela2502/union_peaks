@@ -119,7 +119,7 @@ fn main() {
                                 if match_groups[id].before( &feat ){
                                     max +=1;
                                 }
-                                if max == 100{
+                                if max == 1000{
                                     break;
                                 }
                             //for  match_group in &match_groups{
