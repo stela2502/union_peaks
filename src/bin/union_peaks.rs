@@ -30,7 +30,7 @@ use std::io::Write;
 /// To counter this problem this program creates unions of overlapping peaks over multiple 10x atac datasets.
 
 #[derive(Parser)]
-#[clap(version = "1.0.0", author = "Stefan L. <stefan.lang@med.lu.se>")]
+#[clap(version = "1.1.0", author = "Stefan L. <stefan.lang@med.lu.se>")]
 struct Opts {
     /// the paths to the feature.tsv.gz files (one comma separated string)
     #[clap(default_value= "testData/B.tsv.gz,testData/C.tsv.gz",short, long)]
