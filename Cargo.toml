@@ -17,3 +17,4 @@ path = "src/bin/union_peaks.rs"
 flate2 = "1.0.0"
 clap = { version = "3.0.14", features = ["derive"] }
 indicatif = {version = "*", features = ["rayon"]}
+avl = "0.7"

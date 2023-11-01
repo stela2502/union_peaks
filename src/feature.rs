@@ -14,6 +14,8 @@ pub struct Feature {
     pub addons:Vec<String>,
     pub var:usize,
     pub empty:bool,
+    // the id the data got/matched to in the new tree object.
+    pub tree_id:usize
 }
 
 
@@ -29,7 +31,8 @@ impl Feature{
 			end  : 0,
 			addons : Vec::<String>::with_capacity(10),
 			var: 0,
-			empty: true
+			empty: true,
+			tree_id:0,
 		}
 	}
 
@@ -44,7 +47,8 @@ impl Feature{
 			end  : data[5].parse::<usize>().unwrap_or_default(),
 			addons : Vec::<String>::with_capacity(10),
 			var:0,
-			empty: false
+			empty: false,
+			tree_id:0,
 		}
 	}
 	pub fn parse_bed(dat:&str) ->Self{
@@ -60,7 +64,8 @@ impl Feature{
 				end  : data[2].parse::<usize>().unwrap_or_default(),
 				addons : Vec::<String>::with_capacity(10),
 				var: data[4].parse::<usize>().unwrap_or_default(),
-				empty: false
+				empty: false,
+				tree_id:0,
 			}
 		}else if data.len() > 2{
 			Self{
@@ -72,7 +77,8 @@ impl Feature{
 				end  : data[2].parse::<usize>().unwrap_or_default(),
 				addons : Vec::<String>::with_capacity(10),
 				var:0,
-				empty: false
+				empty: false,
+				tree_id:0,
 			}
 		}
 		else {
@@ -111,6 +117,14 @@ impl Feature{
 		
 		false
 	}
+
+	pub fn adjust( &mut self, start:usize, end:usize ){
+		self.start = start;
+		self.end = end;
+		self.name = format!("{}:{}-{}", self.chr, self.start, self.end);
+		self.name2 = self.name.clone();
+	}
+
 	/// Checks if the self poition is located before the other object
 	pub fn before(&self, other: &Self ) -> bool{
 		if self.chr == other.chr{
