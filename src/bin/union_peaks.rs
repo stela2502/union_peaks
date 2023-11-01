@@ -92,7 +92,7 @@ fn main() {
                     Some( tree ) => {
                         //println!("union_peaks creating a leaf: chr {}:", feat.chr );
                         feat.tree_id = tree.insert( feat.start, feat.end );
-                        println!("feature {}:{}-{} got the id {}", feat.chr, feat.start, feat.end, feat.tree_id );
+                        //println!("feature {}:{}-{} got the id {}", feat.chr, feat.start, feat.end, feat.tree_id );
                     },
                     None => {
                         let mut tree = RegionTree::new();
@@ -107,7 +107,7 @@ fn main() {
         }
         data.push( this_data);
     }
-    println!("I read {id} peak lines");
+    //println!("I read {id} peak lines");
     // So now we should have both all data and all merged regions stored in memory
     println!("exporting modified files:");
     // get the trees flattened
@@ -118,7 +118,7 @@ fn main() {
     let mut i = 0;
     id = 0;
     for mut ofile in ofiles {
-        println!("data[{i}] has {} entries - why?", data[i].len() );
+        //println!("data[{i}] has {} entries - why?", data[i].len() );
         for mut feat in data[i].clone().into_iter(){
             id += 1;
             if id % 1000 ==0{
@@ -126,7 +126,7 @@ fn main() {
             }
             match regions_vec.get( feat.chr.as_str() ){
                 Some(vect) => {
-                    println!("We adjust values in my feat here: {} to {} and {} to {} - feat_id={}.", feat.start, vect[feat.tree_id].0, feat.end, vect[feat.tree_id].1, feat.tree_id);
+                    //println!("We adjust values in my feat here: {} to {} and {} to {} - feat_id={}.", feat.start, vect[feat.tree_id].0, feat.end, vect[feat.tree_id].1, feat.tree_id);
                     feat.adjust( vect[feat.tree_id].0, vect[feat.tree_id].1 );
                     match writeln!( ofile.buff1, "{}", feat ){
                         Ok(_) => (),
@@ -138,7 +138,7 @@ fn main() {
         }
         i +=1;
     }
-    println!("exported {id} checked peak regions in {i} files.");
+    //println!("exported {id} checked peak regions in {i} files.");
 
     pb.finish_with_message( "Finished" );
 
@@ -364,7 +364,7 @@ mod tests {
                             
                         },
                         Err(err) => {
-                            eprintln!("file {i}: {err}");
+                            eprintln!("file {i}: {err}\n");
                             with_data[i] = false;
                         },
                     }
