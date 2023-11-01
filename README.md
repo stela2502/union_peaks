@@ -17,6 +17,9 @@ After that you can clone this package and copmpile the program like that:
 git clone git@github.com:stela2502/union_peaks.git
 cd union_peaks
 cargo build -r
+cp target/release/merge_bed_to_jaspar_bed /usr/bin
+cp target/release/union_peaks /usr/bin
+
 ```
 
 The finished program will be there: ``target/release/union_peaks``. Copy it to your path to use it.
