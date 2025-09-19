@@ -1,3 +1,4 @@
+[![Rust](https://github.com/stela2502/union_peaks/actions/workflows/rust.yml/badge.svg)](https://github.com/stela2502/union_peaks/actions/workflows/rust.yml)
 # union_peaks
 
 This small tool 'normalizes' the peak information from multiple 10x atac seq runs.
